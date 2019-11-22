@@ -75,18 +75,18 @@ class Imu(object):
             xmag=0, ymag=0, zmag=0,
             abs_pressure=0, diff_pressure=0,
             pressure_alt=0, temperature=0,
-            acc_mean = 0, acc_var = .01,
-            gyro_mean = 0, gyro_var = .01,
-            mag_mean = 0, mag_var = .01,
-            baro_mean = 0, baro_var = 0.0000001)
+            acc_mean = 0, acc_var = 0.000001,
+            gyro_mean = 0, gyro_var = 0.000001,
+            mag_mean = 0, mag_var = 0.000001,
+            baro_mean = 0, baro_var = 0.000001)
 
     def from_state(self, state, attack=None):
 
         # accelerometer
-        self.xacc = state.xacc + self.acc_noise
-        self.yacc = state.yacc + self.acc_noise
-        self.zacc = state.zacc + self.acc_noise
-    
+        self.xacc = (state.xacc + self.acc_noise)
+        self.yacc = (state.yacc + self.acc_noise)
+        self.zacc = (state.zacc + self.acc_noise)
+
         # gyroscope
         self.xgyro = state.p + self.gyro_noise
         self.ygyro = state.q + self.gyro_noise
@@ -120,7 +120,6 @@ class Imu(object):
         self.diff_pressure =  (0.5*(1.225)*((state.vN)**2 +(state.vE)**2 + (state.vD)**2))*0.00001 + self.baro_noise # TODO, for velocity
         self.temperature = tempC
         self.pressure_alt = state.alt # TODO compute from pressure
-
         self.time = time.time()
 
 class Gps(object):
@@ -153,12 +152,13 @@ class Gps(object):
             mav.hil_gps_send(int(self.time*sec2usec),
                              toint(self.fix_type),
                              int(self.lat*rad2degE7), int(self.lon*rad2degE7),
-                             int(self.alt*m2mm),
+                             int(self.alt*m2mm),  # *m2mm,
                              toint(self.eph*m2cm), toint(self.epv*m2cm),
                              toint(self.vel*m2cm),
-                             int(self.vn), int(self.ve), int(self.vd),
+                             int(self.vn*m2cm), int(self.ve*m2cm), int(self.vd*m2cm),
                              toint(self.cog*rad2deg*100),
                              toint(self.satellites_visible))
+            #print(str(self.alt))
         except struct.error as e:
 	    raise e
             print 'mav hil gps packet data exceeds int bounds'
@@ -182,8 +182,8 @@ class Gps(object):
         self.lat = state.lat + pos_north_error/r_earth
         self.lon = state.lon + pos_east_error*cos(state.lat)/r_earth
         self.alt = state.alt + self.alt_noise
-        self.eph = 1.0
-        self.epv = 5.0
+        self.eph = 0.8
+        self.epv = 0.95
         self.vel = sog + self.vel_noise
         self.cog = cog
         self.satellites_visible = 10
@@ -192,9 +192,9 @@ class Gps(object):
     def default(cls):
         return cls(time.time(),0,0,0,0,0,0,0,0,0,
                 pos_mean = 0,
-                pos_var = 1,
+                pos_var = 0,
                 alt_mean = 0,
-                alt_var = 5,
+                alt_var = 0,
                 vel_mean = 0,
-                vel_var = 1
+                vel_var = 0
                 )

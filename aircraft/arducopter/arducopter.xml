@@ -36,7 +36,7 @@
     <ixx unit="KG*M2"> 0.036 </ixx>
     <iyy unit="KG*M2"> 0.036 </iyy>
     <izz unit="KG*M2">  0.036 </izz>
-    <emptywt unit="KG"> 1.0 </emptywt>
+    <emptywt unit="KG"> 3.0 </emptywt>
     <location name="CG" unit="IN">
       <x>  0.0 </x>
       <y>  0.0 </y>
@@ -55,42 +55,43 @@
     <contact type="BOGEY" name="frontbase">
       <location unit="M">
         <x>  -0.283 </x>
-        <y>   0.00 </y>
+        <y>  -0.283 </y>
         <z>  -0.033</z>
       </location>
       <static_friction>  0.80 </static_friction>
       <dynamic_friction> 0.50 </dynamic_friction>
+
       <spring_coeff unit="N/M">       800 </spring_coeff>
-      <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7 </damping_coeff>
+      <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7</damping_coeff>
       <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300 </damping_coeff_rebound>
     </contact>
     <contact type="BOGEY" name="rearbase">
       <location unit="M">
         <x>   0.283 </x>
-        <y>   0.00 </y>
-        <z>  -0.033</z>
-      </location>
-      <static_friction>  0.80 </static_friction>
-      <dynamic_friction> 0.50 </dynamic_friction>
-      <spring_coeff unit="N/M">       800 </spring_coeff>
-      <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7 </damping_coeff>
-      <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300 </damping_coeff_rebound>
-    </contact>
-    <contact type="BOGEY" name="leftbase">
-      <location unit="M">
-        <x>   0.00 </x>
         <y>   0.283 </y>
         <z>  -0.033</z>
       </location>
       <static_friction>  0.80 </static_friction>
       <dynamic_friction> 0.50 </dynamic_friction>
       <spring_coeff unit="N/M">       800 </spring_coeff>
-      <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7 </damping_coeff>
+      <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7</damping_coeff>
       <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300 </damping_coeff_rebound>
+    </contact>
+    <contact type="BOGEY" name="leftbase">
+      <location unit="M">
+        <x>  -0.283</x>
+        <y>   0.283 </y>
+        <z>  -0.033</z>
+      </location>
+      <static_friction>  0.80 </static_friction>
+      <dynamic_friction> 0.50 </dynamic_friction>
+      <spring_coeff unit="N/M">       800</spring_coeff>
+      <damping_coeff unit="N/M2/SEC2" type="SQUARE"> 7</damping_coeff>
+      <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300</damping_coeff_rebound>
     </contact>
     <contact type="BOGEY" name="rightbase">
       <location unit="M">
-        <x>   0.00 </x>
+        <x>   0.283 </x>
         <y>  -0.283 </y>
         <z>  -0.033</z>
       </location>
@@ -98,7 +99,7 @@
       <dynamic_friction> 0.50 </dynamic_friction>
       <spring_coeff unit="N/M">       800 </spring_coeff>
       <damping_coeff unit="N/M2/SEC2" type="SQUARE">  7 </damping_coeff>
-      <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300 </damping_coeff_rebound>
+      <damping_coeff_rebound unit="N/M2/SEC2" type="SQUARE">  300</damping_coeff_rebound>
     </contact>
   </ground_reactions>
   <!-- the front and rear motors spin clockwise, and the left and right motors spin counter-clockwise. -->
@@ -106,109 +107,109 @@
     <engine file="a2830-12" name="front">
       <location unit="M">
         <x>  -0.283 </x>
-        <y>   0.00  </y>
+        <y>  -0.283 </y>
         <z>   0.00  </z>
       </location>
       <orient unit="DEG">
-        <pitch> 90.00 </pitch>
+        <pitch> 95.00 </pitch>
         <roll>   0.00 </roll>
         <yaw>    0.00 </yaw>
       </orient>
       <feed>0</feed>
-      <thruster file="prop10x4.5">
+      <thruster file="direct">
         <location unit="M">
           <x>  -0.283 </x>
-          <y>   0.00  </y>
+          <y>  -0.283 </y>
           <z>   0.125 </z>
         </location>
         <orient unit="DEG">
-          <pitch> 90.00 </pitch>
-          <roll>   0.00 </roll>
-          <yaw>    0.00 </yaw>
+          <pitch>95.00 </pitch>
+          <roll>  0.00 </roll>
+          <yaw>   0.00 </yaw>
         </orient>
-        <sense> 1 </sense>
-        <p_factor> 10 </p_factor>
+        <!--<sense> -1 </sense>-->
+        <!--<p_factor> 10 </p_factor>-->
       </thruster>
     </engine>
     <engine file="a2830-12" name="rear">
       <location unit="M">
         <x>   0.283 </x>
-        <y>   0.000 </y>
+        <y>   0.283 </y>
         <z>   0.000 </z>
       </location>
       <orient unit="DEG">
-        <pitch> 90.00 </pitch>
+        <pitch> 85.00 </pitch>
         <roll>   0.00 </roll>
         <yaw>    0.00 </yaw>
       </orient>
       <feed>0</feed>
-      <thruster file="prop10x4.5">
+      <thruster file="direct">
         <location unit="M">
           <x>   0.283 </x>
-          <y>   0.000 </y>
-          <z>   0.125 </z>
-        </location>
-        <orient unit="DEG">
-          <pitch> 90.00 </pitch>
-          <roll>   0.00 </roll>
-          <yaw>    0.00 </yaw>
-        </orient>
-        <sense> 1 </sense>
-        <p_factor> 10 </p_factor>
-      </thruster>
-    </engine>
-    <engine file="a2830-12" name="left">
-      <location unit="M">
-        <x>   0.00 </x>
-        <y>   0.283 </y>
-        <z>   0.00 </z>
-      </location>
-      <orient unit="DEG">
-        <pitch> 90.00 </pitch>
-        <roll>   0.00 </roll>
-        <yaw>    0.00 </yaw>
-      </orient>
-      <feed>0</feed>
-      <thruster file="prop10x4.5">
-        <location unit="M">
-          <x>   0.00 </x>
           <y>   0.283 </y>
           <z>   0.125 </z>
         </location>
         <orient unit="DEG">
-          <pitch> 90.00 </pitch>
+          <pitch> 85.00 </pitch>
           <roll>   0.00 </roll>
           <yaw>    0.00 </yaw>
         </orient>
-        <sense> -1 </sense>
-        <p_factor> 10 </p_factor>
+        <!--<sense> -1 </sense>-->
+        <!--<p_factor> 10 </p_factor>-->
       </thruster>
     </engine>
-    <engine file="a2830-12" name="right">
+    <engine file="a2830-12" name="left">
       <location unit="M">
-        <x>   0.000 </x>
-        <y>  -0.283 </y>
-        <z>   0.000 </z>
+        <x>  -0.283</x>
+        <y>   0.283 </y>
+        <z>   0.00 </z>
       </location>
       <orient unit="DEG">
-        <pitch> 90.00 </pitch>
+        <pitch> 95.00 </pitch>
         <roll>   0.00 </roll>
         <yaw>    0.00 </yaw>
       </orient>
       <feed>0</feed>
-      <thruster file="prop10x4.5">
+      <thruster file="direct">
         <location unit="M">
-          <x>   0.000 </x>
+          <x>  -0.283</x>
+          <y>   0.283 </y>
+          <z>   0.125 </z>
+        </location>
+        <orient unit="DEG">
+          <pitch> 95.00 </pitch>
+          <roll>   0.00 </roll>
+          <yaw>    0.00 </yaw>
+        </orient>
+        <!--<sense> 1 </sense>-->
+        <!--<p_factor> 10 </p_factor>-->
+      </thruster>
+    </engine>
+    <engine file="a2830-12" name="right">
+      <location unit="M">
+        <x>   0.283 </x>
+        <y>  -0.283 </y>
+        <z>   0.000 </z>
+      </location>
+      <orient unit="DEG">
+        <pitch> 85.00 </pitch>
+        <roll>   0.00 </roll>
+        <yaw>    0.00 </yaw>
+      </orient>
+      <feed>0</feed>
+      <thruster file="direct">
+        <location unit="M">
+          <x>   0.283 </x>
           <y>  -0.283 </y>
           <z>   0.125 </z>
         </location>
         <orient unit="DEG">
-          <pitch> 90.00 </pitch>
+          <pitch> 85.00 </pitch>
           <roll>   0.00 </roll>
           <yaw>    0.00 </yaw>
         </orient>
-        <sense> -1 </sense>
-        <p_factor> 10 </p_factor>
+        <!--<sense> 1 </sense>-->
+        <!--<p_factor> 10 </p_factor>-->
       </thruster>
     </engine>
     <tank type="FUEL" number="0">

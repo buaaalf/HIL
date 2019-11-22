@@ -1,28 +1,31 @@
 #!/usr/bin/env python
 import pymavlink.mavutil as mavutil
-import os, sys, pexpect, socket, select, argparse, psutil #,fdpexpect
+import os, sys, pexpect, socket, select, argparse, psutil  # ,fdpexpect
 import pexpect.fdpexpect as fdpexpect
 import time
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules'))
 
-import sensors, util, aircraft
-
+import sensors, util, multicopter
 
 import pymavlink.fgFDM as fgFDM
 
-#mavutil.
+
+# mavutil.
 
 class Simulator():
     @classmethod
     def command_line(cls):
         ''' command line parser '''
         parser = argparse.ArgumentParser()
-        parser.add_argument('--master', help='address used for UDP communication with PX4, e.g. 127.0.0.1:14560', default='127.0.0.1:4560')
-        parser.add_argument('--script', help='relative path to jsbsim script', default='data/easystar_test.xml')
+        parser.add_argument('--master', help='address used for UDP communication with PX4, e.g. 127.0.0.1:14560',
+                            default='127.0.0.1:4560')
+        parser.add_argument('--script', help='relative path to jsbsim script', default='data/arducopter_test.xml')
         parser.add_argument('--options', help='jsbsim options', default=None)
-        parser.add_argument('--fgout', help='address used for UDP communication with flightgear, e.g. 127.0.0.1:5503', default=None)
+        parser.add_argument('--fgout', help='address used for UDP communication with flightgear, e.g. 127.0.0.1:5503',
+                            default='127.0.0.1:5550')  # 127.0.0.1:5550
         args = parser.parse_args()
-        
+
         inst = cls(sitl_address=args.master, fgout=args.fgout, script=args.script, options=args.options)
         inst.run()
 
@@ -32,11 +35,11 @@ class Simulator():
 
         self.Imu = sensors.Imu.default()
         self.Gps = sensors.Gps.default()
-        self.Controls = aircraft.Controls.default()
+        self.Controls = multicopter.Controls.default()
 
         self.script = script
         self.options = options
-        
+
         self.jsb = None
         self.jsb_console = None
         self.jsb_in = None
@@ -49,14 +52,14 @@ class Simulator():
 
     def run(self):
         # send something to simulator to get it running
-        #self.sitl = mavutil.mavudp(self.sitl_address, input=False)
+        # self.sitl = mavutil.mavudp(self.sitl_address, input=False)
         self.sitl = mavutil.mavlink_connection('tcpin:localhost:4560')
         self.sitl.wait_heartbeat()
         print("Heartbeat from system (system %u component %u)" % (self.sitl.target_system,
                                                                   self.sitl.target_system))
 
         self.sitl.write("hello")
-        #setup output to flightgear
+        # setup output to flightgear
 
         if self.fg_address is not None:
             fg_address = (self.fg_address.split(':')[0], int(self.fg_address.split(':')[1]))
@@ -67,13 +70,13 @@ class Simulator():
         self.init_JSBSim()
         util.pexpect_drain(self.jsb_console)
         self.jsb_console.send('resume\n')
-        self.jsb_set('simulation/reset',1)
+        self.jsb_console.expect('Resuming')
+        #self.jsb_set('simulation/reset', 1)
         self.update()
-        #self.jsb.expect("\(Trim\) executed")
-        
+        # self.jsb.expect("\(Trim\) executed")
+
         while self.update(): pass
-    
-    
+
     def update(self):
         # watch files
         rin = [self.jsb_in.fileno(), self.jsb_console.fileno(), self.jsb.fileno(), self.sitl.port.fileno()]
@@ -86,46 +89,46 @@ class Simulator():
 
         if self.jsb_in.fileno() in rin:
             self.process_sensor_data()
-            #print 'self.jsb_in.fileno()'
+            # print 'self.jsb_in.fileno()'
 
         if self.sitl.port.fileno() in rin:
             msg = self.sitl.recv_msg()
-            self.Controls = aircraft.Controls.from_mavlink(msg)
+            self.Controls = multicopter.Controls.from_mavlink(msg)
             self.Controls.send_to_jsbsim(self.jsb_console)
-            #print 'self.sitl.port.fileno()'
-        
+            # print 'self.sitl.port.fileno()'
+
         if self.jsb_console.fileno() in rin:
             util.pexpect_drain(self.jsb_console)
-            #print 'self.jsb_console.fileno()'
+            # print 'self.jsb_console.fileno()'
 
         if self.jsb.fileno() in rin:
             util.pexpect_drain(self.jsb)
-            #print 'self.jsb.fileno()'
-            
+            # print 'self.jsb.fileno()'
+
         return True
 
     def process_sensor_data(self):
         buf = self.jsb_in.recv(self.fdm.packet_size())
         if len(buf) == 408:
             self.fdm.parse(buf)
-            self.Imu.from_state(aircraft.State.from_fdm(self.fdm))
+            self.Imu.from_state(multicopter.State.from_fdm(self.fdm))
             self.Imu.send_to_mav(self.sitl.mav)
-            self.Gps.from_state(aircraft.State.from_fdm(self.fdm))
+            self.Gps.from_state(multicopter.State.from_fdm(self.fdm))
             self.Gps.send_to_mav(self.sitl.mav)
             if self.fg_address is not None:
                 self.fg_out.send(self.fdm.pack())
-            #print self.Imu
+            # print self.Imu
 
     def init_JSBSim(self):
         cmd = "JSBSim --realtime  --suspend --nice --simulation-rate=400  --script=%s --logdirectivefile=data/fgout.xml" % self.script
         jsb = pexpect.spawn(cmd, logfile=sys.stdout, timeout=10)
         jsb.delaybeforesend = 0
         util.pexpect_autoclose(jsb)
-        #time.sleep(10)
+        # time.sleep(10)
         print 'Waiting for JSBSim'
         jsb.expect("JSBSim startup beginning")
         i = jsb.expect(["Creating input TCP socket on port (\d+)",
-                    "Could not bind to socket for input"])
+                        "Could not bind to socket for input"])
         if i == 1:
             print("Failed to start JSBSim - is another copy running?")
             sys.exit(1)
@@ -139,12 +142,13 @@ class Simulator():
         print("JSBSim console on %s" % str(jsb_out_address))
         jsb_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         jsb_out.connect(jsb_out_address)
-        #jsb_out.bind(jsb_out_address)
-        #jsb_console = fdpexpect.fdspawn(jsb_out.fileno(), logfile=sys.stdout)
+        # jsb_out.bind(jsb_out_address)
+        # jsb_console = fdpexpect.fdspawn(jsb_out.fileno(), logfile=sys.stdout)
         jsb_console = fdpexpect.fdspawn(jsb_out.fileno(), logfile=sys.stdout)
         jsb_console.delaybeforesend = 0
-        jsb_console.logfile = None
-        
+        jsb_console.logfile = open('/home/mvacanti/logf.txt', 'wt')
+        jsb_console.expect('Connected to JSBSim server')
+
         # setup input from jsbsim
         jsb_in_address = ('127.0.0.1', 5123)
         print("JSBSim FG FDM input on %s" % str(jsb_in_address))
@@ -162,7 +166,8 @@ class Simulator():
     def jsb_set(self, variable, value):
         '''set a JSBSim variable'''
         self.jsb_console.send('set %s %s\r\n' % (variable, value))
+        #self.jsb_console.send('set %s %s\n' % (variable, value))
+
 
 if __name__ == '__main__':
     Simulator.command_line()
-    

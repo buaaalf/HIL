@@ -111,7 +111,9 @@ def pexpect_drain(p):
     '''drain any pending input'''
     try:
         p.read_nonblocking(1000, timeout=0)
-    except pexpect.TIMEOUT:
+    #except pexpect.EOF:
+    #except pexpect.TIMEOUT:
+    except:
         pass
 
 def start_SIL(atype, valgrind=False, wipe=False, CLI=False, height=None):

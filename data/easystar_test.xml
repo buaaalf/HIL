@@ -21,13 +21,14 @@
       <condition> simulation/sim-time-sec le 0.01 </condition>
       <set name="propulsion/engine[0]/set-running" value="1"/>
       <notify/>
-    </event>
-
+    </event>get
+    <!--
     <event name="Trim">
       <condition>simulation/sim-time-sec ge 5</condition>
       <set name="simulation/do_simple_trim" value="1"/>
       <notify/>
     </event>
+    -->
   </run>
 
     <event name="Repeating Notify" persistent="true">
