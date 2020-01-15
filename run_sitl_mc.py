@@ -2,16 +2,12 @@
 import pymavlink.mavutil as mavutil
 import os, sys, pexpect, socket, select, argparse, psutil  # ,fdpexpect
 import pexpect.fdpexpect as fdpexpect
-import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'modules'))
 
 import sensors, util, multicopter
 
 import pymavlink.fgFDM as fgFDM
-
-
-# mavutil.
 
 class Simulator():
     @classmethod
@@ -120,11 +116,10 @@ class Simulator():
             # print self.Imu
 
     def init_JSBSim(self):
-        cmd = "JSBSim --realtime  --suspend --nice --simulation-rate=400  --script=%s --logdirectivefile=data/fgout.xml" % self.script
+        cmd = "JSBSim --realtime  --suspend --simulation-rate=400  --script=%s --logdirectivefile=data/fgout.xml" % self.script
         jsb = pexpect.spawn(cmd, logfile=sys.stdout, timeout=10)
         jsb.delaybeforesend = 0
         util.pexpect_autoclose(jsb)
-        # time.sleep(10)
         print 'Waiting for JSBSim'
         jsb.expect("JSBSim startup beginning")
         i = jsb.expect(["Creating input TCP socket on port (\d+)",
