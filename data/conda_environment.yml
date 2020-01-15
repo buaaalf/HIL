@@ -37,5 +37,4 @@ dependencies:
     - future==0.18.0
     - lxml==4.4.1
     - pymavlink==2.4.0
-prefix: /home/mvacanti/anaconda3/envs/PX4_JSB_SITL
 
